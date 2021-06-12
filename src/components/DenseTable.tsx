@@ -1,107 +1,131 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { TableContent } from "./TableContent"
+import { Modal, Button } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-import { Button, Paper } from "@material-ui/core"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@material-ui/core"
 
 interface IRow {
-  id: number
-  firstName: string
-  lastName: string
-  phone: number
-  registrationDate: string
+    id: number
+    firstName: string
+    lastName: string
+    phone: number
+    registrationDate: string
 }
-
-const handleEdit = (id: number) => {
-  console.log("editar ", id)
-}
-
-const handleDelete = (id: number) => {
-  console.log("borrar ", id)
-}
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-  container: {
-    maxWidth: 1500,
-    margin: "auto",
-    marginTop: "50px",
-  },
-})
 
 function createData(
-  id: number,
-  firstName: string,
-  lastName: string,
-  phone: number,
-  registrationDate: string
+    id: number,
+    firstName: string,
+    lastName: string,
+    phone: number,
+    registrationDate: string
 ): IRow {
-  return { id, firstName, lastName, phone, registrationDate }
+    return { id, firstName, lastName, phone, registrationDate }
 }
 
+const useStyles = makeStyles(theme => ({
+    paper: {
+        position: "absolute",
+        width: 400,
+        backgroundColor: theme.palette.background.paper,
+        border: "2px solid #000",
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+    },
+}))
+
 export const DenseTable = () => {
-  const [rows, setRows] = useState<Array<IRow>>([
-    createData(1, "Andres", "Bustamante", 78873788, "9/06/21"),
-    createData(2, "Josue", "Pabon", 78569125, "10/06/21"),
-  ])
-  const classes = useStyles()
-  return (
-    <>
-      <TableContainer component={Paper} className={classes.container}>
-        <Table
-          className={classes.table}
-          size="medium"
-          aria-label="a dense table"
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>id</TableCell>
-              <TableCell align="right">First Name</TableCell>
-              <TableCell align="right">Last Name</TableCell>
-              <TableCell align="right">Phone</TableCell>
-              <TableCell align="right">Registration Date</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map(row => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row">
-                  {row.id}
-                </TableCell>
-                <TableCell align="right">{row.firstName}</TableCell>
-                <TableCell align="right">{row.lastName}</TableCell>
-                <TableCell align="right">{row.phone}</TableCell>
-                <TableCell align="right">{row.registrationDate}</TableCell>
-                <TableCell align="right">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleEdit(row.id)}
-                  >
-                    Edit
-                  </Button>{" "}
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => handleDelete(row.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
-  )
+    const classes = useStyles()
+    useEffect(() => {
+        console.log("Me monte")
+    }, [])
+
+    const [rows, setRows] = useState<Array<IRow>>([
+        createData(1, "Andres", "Bustamante", 78873788, "9/06/21"),
+        createData(2, "Josue", "Pabon", 78569125, "10/06/21"),
+        createData(3, "Grisel", "Quispe", 75567455, "11/06/21"),
+    ])
+
+    const [idG, setIdG] = useState<number>(0)
+    const [openModal, setOpenModal] = useState<boolean>(false)
+
+    const toggleModal = () => {
+        setOpenModal(!openModal)
+    }
+
+    const handleInsert = () => {
+        // setRows(rows.filter(row => row.id !== idG))
+        // setOpenModal(false)
+        // setIdG(0)
+    }
+
+    const handleDelete = () => {
+        setRows(rows.filter(row => row.id !== idG))
+        setOpenModal(false)
+        setIdG(0)
+    }
+
+    const modalStyle = {
+        top: `50%`,
+        left: `50%`,
+        transform: `translate(-50%, -50%)`,
+    }
+
+    const ddelete = (
+        <div style={modalStyle} className={classes.paper}>
+            <h2 id="simple-modal-title">Delete</h2>
+            <p id="simple-modal-description">
+                Are you sure that deleting this row?
+            </p>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleDelete()}
+            >
+                Yes
+            </Button>{" "}
+            <Button variant="text" color="secondary" onClick={toggleModal}>
+                Cancel
+            </Button>
+        </div>
+    )
+
+    const insert = (
+        <div style={modalStyle} className={classes.paper}>
+            <h2 id="simple-modal-title">Insert</h2>
+            <p id="simple-modal-description">Enter the information</p>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleInsert()}
+            >
+                Insert
+            </Button>{" "}
+            <Button variant="text" color="secondary" onClick={toggleModal}>
+                Cancel
+            </Button>
+        </div>
+    )
+
+    const body = {
+        ddelete,
+        insert,
+    }
+
+    return (
+        <>
+            <TableContent
+                rows={rows}
+                toggleModal={toggleModal}
+                setIdG={setIdG}
+            />
+
+            <Modal
+                open={openModal}
+                onClose={toggleModal}
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+            >
+                {body.insert}
+            </Modal>
+        </>
+    )
 }
