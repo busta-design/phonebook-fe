@@ -1,10 +1,10 @@
-export type IBody = {
+export interface IBody {
     ddelete: JSX.Element
     insert: JSX.Element
     edit: JSX.Element
 }
 
-export type IRow = {
+export interface IRow {
     id: number
     firstName: string
     lastName: string

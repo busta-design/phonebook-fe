@@ -11,7 +11,7 @@ import { Button, Paper } from "@material-ui/core"
 import { Modals } from "../constants/modals"
 
 import { makeStyles } from "@material-ui/core/styles"
-import { IRow } from "../types/iBody"
+import { IRow } from "../types/types"
 
 const useStyles = makeStyles({
     table: {
