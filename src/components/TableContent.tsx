@@ -8,6 +8,8 @@ import {
 } from "@material-ui/core"
 import { Button, Paper } from "@material-ui/core"
 
+import { Modals } from "../constants/modals"
+
 import { makeStyles } from "@material-ui/core/styles"
 const useStyles = makeStyles({
     table: {
@@ -34,13 +36,24 @@ type IRow = {
     registrationDate: string
 }
 
+// type IBody = {
+//     ddelete: JSX.Element
+//     insert: JSX.Element
+// }
+
 type IBoth = {
     rows: Array<IRow>
     toggleModal: () => void
     setIdG: (id: number) => void
+    setActionModal: (actionModal: any) => void
 }
 
-export const TableContent = ({ rows, toggleModal, setIdG }: IBoth) => {
+export const TableContent = ({
+    rows,
+    toggleModal,
+    setIdG,
+    setActionModal,
+}: IBoth) => {
     const classes = useStyles()
     return (
         <div>
@@ -84,6 +97,7 @@ export const TableContent = ({ rows, toggleModal, setIdG }: IBoth) => {
                                         color="primary"
                                         onClick={() => {
                                             setIdG(row.id)
+                                            setActionModal(Modals.Delete)
                                             toggleModal()
                                         }}
                                     >
@@ -94,6 +108,7 @@ export const TableContent = ({ rows, toggleModal, setIdG }: IBoth) => {
                                         color="secondary"
                                         onClick={() => {
                                             setIdG(row.id)
+                                            setActionModal(Modals.Delete)
                                             toggleModal()
                                         }}
                                     >
@@ -107,8 +122,12 @@ export const TableContent = ({ rows, toggleModal, setIdG }: IBoth) => {
                 <Button
                     className={classes.button}
                     variant="contained"
+                    // onClick={setActionModal(Object.keys(IBody).find(key: string => key === 'insert'))}
                     color="primary"
-                    onClick={() => console.log("add")}
+                    onClick={() => {
+                        setActionModal(Modals.Insert)
+                        toggleModal()
+                    }}
                 >
                     Insert new Contact
                 </Button>
