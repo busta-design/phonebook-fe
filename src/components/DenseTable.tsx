@@ -2,15 +2,15 @@ import { useState, useEffect, ChangeEvent } from "react"
 import { TableContent } from "./TableContent"
 import { Modal, Button, TextField, InputAdornment } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-import { IBody } from "../types/iBody"
+import { IBody, IRow } from "../types/iBody"
 
-interface IRow {
-    id: number
-    firstName: string
-    lastName: string
-    phone: number
-    registrationDate: string
-}
+// interface IRow {
+//     id: number
+//     firstName: string
+//     lastName: string
+//     phone: number
+//     registrationDate: string
+// }
 
 function createData(
     id: number,
@@ -107,6 +107,33 @@ export const DenseTable = () => {
         })
     }
 
+    const handleEdit = () => {
+        console.log("Edit")
+        const { id, firstName, lastName, phone, registrationDate } = dataInsert
+        let auxRows = rows.map((el: IRow) => {
+            if (el.id === id) {
+                return createData(
+                    id,
+                    firstName || "none",
+                    lastName || "none",
+                    phone || 1111,
+                    new Date(Date.now()).toLocaleDateString()
+                )
+            }
+            return el
+        })
+        // registrationDate || "none"
+        setRows(auxRows)
+        setOpenModal(false)
+        setDataInsert({
+            id: 0,
+            firstName: "",
+            lastName: "",
+            phone: 7,
+            registrationDate: "",
+        })
+    }
+
     const handleDelete = () => {
         setRows(rows.filter(row => row.id !== idG))
         setOpenModal(false)
@@ -178,9 +205,56 @@ export const DenseTable = () => {
         </div>
     )
 
+    const edit = (
+        <div style={modalStyle} className={classes.paper}>
+            <h2 id="simple-modal-title">Edit</h2>
+            <p id="simple-modal-description">Change the information</p>
+            <form className={classes.textfield} noValidate autoComplete="off">
+                <TextField
+                    name="firstName"
+                    label="First Name"
+                    value={dataInsert.firstName}
+                    onChange={handleChange}
+                />
+                <TextField
+                    name="lastName"
+                    label="Last Name"
+                    value={dataInsert.lastName}
+                    onChange={handleChange}
+                />
+
+                <TextField
+                    name="phone"
+                    label="Phone"
+                    value={dataInsert.phone}
+                    onChange={handleChange}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                +591
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </form>
+            <div style={{ marginTop: "15px" }} />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleEdit()}
+            >
+                Upload
+            </Button>{" "}
+            <Button variant="text" color="secondary" onClick={toggleModal}>
+                Cancel
+            </Button>
+        </div>
+    )
+
     const body: IBody = {
         ddelete,
         insert,
+        edit,
     }
 
     return (
@@ -190,6 +264,7 @@ export const DenseTable = () => {
                 toggleModal={toggleModal}
                 setIdG={setIdG}
                 setActionModal={setActionModal}
+                setDataInsert={setDataInsert}
             />
 
             <Modal

@@ -11,6 +11,8 @@ import { Button, Paper } from "@material-ui/core"
 import { Modals } from "../constants/modals"
 
 import { makeStyles } from "@material-ui/core/styles"
+import { IRow } from "../types/iBody"
+
 const useStyles = makeStyles({
     table: {
         minWidth: 650,
@@ -28,17 +30,12 @@ const useStyles = makeStyles({
     },
 })
 
-type IRow = {
-    id: number
-    firstName: string
-    lastName: string
-    phone: number
-    registrationDate: string
-}
-
-// type IBody = {
-//     ddelete: JSX.Element
-//     insert: JSX.Element
+// interface IRow {
+//     id: number
+//     firstName: string
+//     lastName: string
+//     phone: number
+//     registrationDate: string
 // }
 
 type IBoth = {
@@ -46,6 +43,7 @@ type IBoth = {
     toggleModal: () => void
     setIdG: (id: number) => void
     setActionModal: (actionModal: any) => void
+    setDataInsert: (data: IRow) => void
 }
 
 export const TableContent = ({
@@ -53,6 +51,7 @@ export const TableContent = ({
     toggleModal,
     setIdG,
     setActionModal,
+    setDataInsert,
 }: IBoth) => {
     const classes = useStyles()
     return (
@@ -97,7 +96,15 @@ export const TableContent = ({
                                         color="primary"
                                         onClick={() => {
                                             setIdG(row.id)
-                                            setActionModal(Modals.Delete)
+                                            setDataInsert({
+                                                id: row.id,
+                                                firstName: row.firstName,
+                                                lastName: row.lastName,
+                                                phone: row.phone,
+                                                registrationDate:
+                                                    row.registrationDate,
+                                            })
+                                            setActionModal(Modals.Edit)
                                             toggleModal()
                                         }}
                                     >
