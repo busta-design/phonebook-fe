@@ -23,10 +23,16 @@ const useStyles = makeStyles({
         marginTop: "50px",
         textAlign: "center",
     },
-    button: {
+    buttonAdd: {
         maxWidth: 500,
         marginBottom: "10px",
         marginTop: "10px",
+    },
+    buttonRefresh: {
+        // marginRight: "0",
+        float: "right",
+        margin: "10px 15px",
+        // margin: "10px",
     },
 })
 
@@ -44,6 +50,7 @@ type IBoth = {
     setIdG: (id: number) => void
     setActionModal: (actionModal: any) => void
     setDataInsert: (data: IRow) => void
+    refresh: (m: string) => void
 }
 
 export const TableContent = ({
@@ -52,6 +59,7 @@ export const TableContent = ({
     setIdG,
     setActionModal,
     setDataInsert,
+    refresh,
 }: IBoth) => {
     const classes = useStyles()
     return (
@@ -127,7 +135,7 @@ export const TableContent = ({
                     </TableBody>
                 </Table>
                 <Button
-                    className={classes.button}
+                    className={classes.buttonAdd}
                     variant="contained"
                     // onClick={setActionModal(Object.keys(IBody).find(key: string => key === 'insert'))}
                     color="primary"
@@ -137,6 +145,15 @@ export const TableContent = ({
                     }}
                 >
                     Insert new Contact
+                </Button>
+                <Button
+                    className={classes.buttonRefresh}
+                    variant="outlined"
+                    // onClick={setActionModal(Object.keys(IBody).find(key: string => key === 'insert'))}
+                    color="secondary"
+                    onClick={() => refresh("Datos actualizados")}
+                >
+                    Actualizar
                 </Button>
             </TableContainer>
         </div>

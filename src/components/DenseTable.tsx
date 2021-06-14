@@ -1,28 +1,40 @@
-import { useState, useEffect, ChangeEvent } from "react"
+import { useState, useEffect, ChangeEvent, Dispatch } from "react"
 import { TableContent } from "./TableContent"
 import { ModalGen } from "./ModalGen"
+import { SnackbarMessage } from "./SnackbarMessage"
 import { IBody, IRow } from "../types/types"
+import axios from "axios"
 
-function createData(
-    id: number,
-    firstName: string,
-    lastName: string,
-    phone: number,
-    registrationDate: string
-): IRow {
-    return { id, firstName, lastName, phone, registrationDate }
+const getData = async (setRows: Dispatch<React.SetStateAction<IRow[]>>) => {
+    const response = await axios.get(`https://localhost:44328/api/Contact`)
+    const data: Array<IRow> = response.data
+    setRows(data)
+}
+
+const deleteFact = async (id: number) => {
+    const info = await axios.delete(`https://localhost:44328/api/Contact/${id}`)
+    const response = info.data
+}
+
+const insertFact = async (row: IRow) => {
+    const info = await axios.post(`https://localhost:44328/api/Contact`, row)
+    const response = info.data
+}
+
+const editFact = async (row: IRow) => {
+    const info = await axios.put(
+        `https://localhost:44328/api/Contact/${row.id}`,
+        row
+    )
+    const response = info.data
 }
 
 export const DenseTable = () => {
     useEffect(() => {
-        console.log("Me monte")
+        getData(setRows)
     }, [])
 
-    const [rows, setRows] = useState<Array<IRow>>([
-        createData(1, "Andres", "Bustamante", 78873788, "9/06/21"),
-        createData(2, "Josue", "Pabon", 78569125, "10/06/21"),
-        createData(3, "Grisel", "Quispe", 75567455, "11/06/21"),
-    ])
+    const [rows, setRows] = useState<Array<IRow>>([])
 
     const [dataInsert, setDataInsert] = useState<IRow>({
         id: 0,
@@ -35,32 +47,32 @@ export const DenseTable = () => {
     const [actionModal, setActionModal] = useState<keyof IBody>("ddelete")
     const [openModal, setOpenModal] = useState<boolean>(false)
 
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
+    const [messageSnackbar, setMessageSnackbar] = useState<string>("")
+
+    const refresh = async (actionName: string) => {
+        await getData(setRows)
+        setMessageSnackbar(actionName)
+        setOpenSnackbar(true)
+    }
+
     const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = target
         setDataInsert({
             ...dataInsert,
             [name]: value,
         })
-        console.log(value)
     }
     const toggleModal = () => {
         setOpenModal(!openModal)
     }
 
-    const handleInsert = () => {
-        console.log("Insert")
-        const { firstName, lastName, phone } = dataInsert
-        let auxRows = [...rows]
-        auxRows.push(
-            createData(
-                Math.trunc(Math.random() * 100),
-                firstName || "none",
-                lastName || "none",
-                phone || 1111,
-                new Date(Date.now()).toLocaleDateString()
-            )
-        )
-        setRows(auxRows)
+    const handleInsert = async () => {
+        await insertFact({
+            ...dataInsert,
+            registrationDate: new Date(Date.now()).toLocaleDateString(),
+        })
+        await refresh("Dato Agregado")
         setOpenModal(false)
         setDataInsert({
             id: 0,
@@ -70,22 +82,13 @@ export const DenseTable = () => {
             registrationDate: "",
         })
     }
-    const handleEdit = () => {
-        console.log("Edit")
-        const { id, firstName, lastName, phone } = dataInsert
-        let auxRows = rows.map((el: IRow) => {
-            if (el.id === id) {
-                return createData(
-                    id,
-                    firstName || "none",
-                    lastName || "none",
-                    phone || 1111,
-                    new Date(Date.now()).toLocaleDateString()
-                )
-            }
-            return el
+
+    const handleEdit = async () => {
+        await editFact({
+            ...dataInsert,
+            registrationDate: new Date(Date.now()).toLocaleDateString(),
         })
-        setRows(auxRows)
+        await refresh("Dato Editado")
         setOpenModal(false)
         setDataInsert({
             id: 0,
@@ -95,8 +98,9 @@ export const DenseTable = () => {
             registrationDate: "",
         })
     }
-    const handleDelete = () => {
-        setRows(rows.filter(row => row.id !== idG))
+    const handleDelete = async () => {
+        await deleteFact(idG)
+        await refresh("Dato Eliminado")
         setOpenModal(false)
         setIdG(0)
         setDataInsert({
@@ -116,6 +120,7 @@ export const DenseTable = () => {
                 setIdG={setIdG}
                 setActionModal={setActionModal}
                 setDataInsert={setDataInsert}
+                refresh={refresh}
             />
 
             <ModalGen
@@ -127,6 +132,12 @@ export const DenseTable = () => {
                 handleInsert={handleInsert}
                 dataInsert={dataInsert}
                 handleChange={handleChange}
+            />
+
+            <SnackbarMessage
+                openSnackbar={openSnackbar}
+                setOpenSnackbar={setOpenSnackbar}
+                messageSnackbar={messageSnackbar}
             />
         </>
     )
